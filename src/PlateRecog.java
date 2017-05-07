@@ -22,8 +22,15 @@ public class PlateRecog {
 
     Map<String, Date> plates;
 
-    PlateRecog() {
+    private final int DISTANCE;
+    private final int SPEEDLIMIT;
+
+    PlateRecog(int DISTANCE, int SPEEDLIMIT) {
+        this.DISTANCE = DISTANCE;
+        this.SPEEDLIMIT = SPEEDLIMIT;
+
         plates = new HashMap<>();
+
     }
 
     /**
