@@ -5,15 +5,14 @@ import com.google.gson.JsonParser;
 import okhttp3.*;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * PlateRecog is used for finding the platenumber of a car
- * and keeping track of speeding cars.
+ * and keeping track of speeding cars. When creating a
+ * PlateRecog object specifiy the distance and speedlimit.
  *
  * It uses openalpr for the plate-recognintion, okhttp for
  * the http request and gson for reciving results.
@@ -22,38 +21,30 @@ public class PlateRecog {
 
     Map<String, Date> plates;
 
-    private final int DISTANCE;
-    private final int SPEEDLIMIT;
+    private final double MINTIMESECONDS;
+    private final double DISTANCE;
 
-    PlateRecog(int DISTANCE, int SPEEDLIMIT) {
-        this.DISTANCE = DISTANCE;
-        this.SPEEDLIMIT = SPEEDLIMIT;
-
+    PlateRecog(double distance, int speedlimit) {
+        DISTANCE = distance;
+        MINTIMESECONDS = distance / (speedlimit / 3.6);
         plates = new HashMap<>();
-
     }
 
     /**
      * Stores plate and date for later check. Returns
-     * boolean representing succes of soring. Can return
-     * false if APII faild also
-     * @param path to image
+     * boolean representing succes of string.
+     * @param plate to image
      * @param date of checkpoint crossing
      * @return true/false if able to store
      */
-    public boolean storePlate(String path, Date date) {
-            File file = new File(path);
-            try {
-                String plate = findPlate(file);
-                if (!containsPlate(plate)) {
-                    plates.put(plate, date);
-                    return true;
-                }
-            } catch (Exception e) {
-                return false;
-            }
+    public boolean storePlate(String plate, Date date) {
+        if (!containsPlate(plate)) {
+            plates.put(plate, date);
             return true;
+        } else {
+            return false;
         }
+    }
 
     /**
      * Recognises the platenumber if a car. When calling just send the
@@ -62,7 +53,7 @@ public class PlateRecog {
      * @return a string containing the platenumber
      * @throws Exception if request fails 
      */
-    private String findPlate(File file) throws Exception {
+    public String findPlate(File file) {
         OkHttpClient client = new OkHttpClient();
         RequestBody r = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
@@ -75,14 +66,36 @@ public class PlateRecog {
                 .post(r)
                 .build();
 
-        Response res = client.newCall(req).execute();
+        try {
+            Response res = client.newCall(req).execute();
 
-        JsonElement jelement = new JsonParser().parse(res.body().string());
-        JsonObject  jobject = jelement.getAsJsonObject();
-        JsonArray jarray = jobject.getAsJsonArray("results");
-        jobject = jarray.get(0).getAsJsonObject();
+            JsonElement jelement = new JsonParser().parse(res.body().string());
+            JsonObject  jobject = jelement.getAsJsonObject();
+            JsonArray jarray = jobject.getAsJsonArray("results");
+            jobject = jarray.get(0).getAsJsonObject();
 
-        return jobject.get("plate").getAsString();
+            return jobject.get("plate").getAsString();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Check if a car has been speednig between the checkpoints.
+     * If it has method will return average speed in km/h, if
+     * not it will return -1
+     * @param plate of the car to check
+     * @param date of second crossing
+     * @return average speed if speeding, -1 if not
+     */
+    public Double isSpeeding(String plate, Date date) {
+        double timeCar = (date.getTime() - plates.get(plate).getTime()) / 1000;
+
+        if (timeCar < MINTIMESECONDS) {
+            return (DISTANCE / timeCar) * 3.6;
+        } else {
+            return -1.0;
+        }
     }
 
     private boolean containsPlate(String plate) {
