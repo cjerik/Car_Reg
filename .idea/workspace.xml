@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7c822fcd-3df2-4a0b-840e-3bb842e5ef5e" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/Main.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/PlateRecog.java" afterPath="$PROJECT_DIR$/src/PlateRecog.java" />
-    </list>
+    <list default="true" id="7c822fcd-3df2-4a0b-840e-3bb842e5ef5e" name="Default" comment="" />
     <ignored path="CarReg.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="$PROJECT_DIR$/out/" />
@@ -656,12 +652,12 @@
       <workItem from="1493972842426" duration="5734000" />
       <workItem from="1493987927114" duration="2724000" />
       <workItem from="1494000927982" duration="12000" />
-      <workItem from="1494154723294" duration="1467000" />
+      <workItem from="1494154723294" duration="1553000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="12651000" />
+    <option name="totallyTimeSpent" value="12737000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1280" height="713" extended-state="6" />
