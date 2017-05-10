@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Created by carl-johaneriksson on 10/05/17.
@@ -95,7 +97,17 @@ public class FrontEnd {
         gbc.gridy = 3;
         gbc.insets = new Insets(5, 5, 5, 10);
         gbc.weightx = 1;
+        JFileChooser chooser = new JFileChooser();
+
+        btnChooseFile.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                chooser.showOpenDialog(btnChooseFile); 
+            }
+        });
+
         pnlMain.add(btnChooseFile, gbc);
+
 
         Object[] data = new Object[4];
         data[0] = "Hej";
