@@ -1,26 +1,38 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Date;
 
 /**
  * Created by carl-johaneriksson on 10/05/17.
  */
 public class FrontEnd {
 
+    PlateRecog plateRecog;
+
     public static void main(String[] args) throws Exception {
         FrontEnd frontEnd = new FrontEnd();
         frontEnd.run();
     }
 
+    /**
+     * Runs the acutal program, public method, can be called from a object.
+     * @throws Exception
+     */
     public void run() throws Exception {
         setJFrame();
     }
 
-
+    /**
+     * Sets the GUI frame. Calls for setJPanel() which intiates the
+     * GUI.
+     * @throws Exception
+     */
     private void setJFrame() throws Exception {
         JFrame frame = new JFrame("CarReg");
         Container cp = frame.getContentPane();
@@ -40,22 +52,25 @@ public class FrontEnd {
         frame.setVisible(true);
     }
 
-
+    /**
+     * Sets the JPanel, with all buttons and Text Fields.
+     * @return the JPanel for the GUI.
+     */
     private JPanel setJPanel() {
         JPanel pnlMain = new JPanel();
         pnlMain.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
         JLabel lblDistance = new JLabel("Distance");
-        //gbc = new GridBagConstraints(); Uppdatera vid varje ny component
+        //gbc = new GridBagConstraints(); Update with each new component.
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0; // What row and col to take
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 10, 0, 0);  //Margin
-        gbc.weightx = 1; // Typ hur det scalar eller något sånt, ganska oviktig sålänge alla har samma
-        pnlMain.add(lblDistance, gbc); // Lägg till i panel
+        gbc.weightx = 1; // How it scales, irrelevant as long as all buttons is the same
+        pnlMain.add(lblDistance, gbc); // Add to panel.
 
-        JTextField txtName = new JTextField();
+        JTextField txtDistance = new JTextField();
         gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridwidth = 3;
@@ -63,16 +78,16 @@ public class FrontEnd {
         gbc.gridy = 0;
         gbc.insets = new Insets(5, 5, 0, 10);
         gbc.weightx = 1;
-        pnlMain.add(txtName, gbc);
+        pnlMain.add(txtDistance, gbc);
 
         JLabel lblSpeedLimit = new JLabel("Speed limit");
-        //gbc = new GridBagConstraints(); Uppdatera vid varje ny component
+        //gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0; // What row and col to take
         gbc.gridy = 1;
         gbc.insets = new Insets(0, 10, 0, 0);  //Margin
-        gbc.weightx = 1; // Typ hur det scalar eller något sånt, ganska oviktig sålänge alla har samma
-        pnlMain.add(lblSpeedLimit, gbc); // Lägg till i panel
+        gbc.weightx = 1;
+        pnlMain.add(lblSpeedLimit, gbc);
 
         JTextField txtSpeedLimit = new JTextField();
         gbc = new GridBagConstraints();
@@ -96,19 +111,24 @@ public class FrontEnd {
         btnSet.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                txtSpeedLimit.getAction();
+                double distance = Double.valueOf(txtDistance.getText());
+                int speedLimit = Integer.parseInt(txtSpeedLimit.getText());
+                txtDistance.setText("");
+                txtSpeedLimit.setText("");
+                PlateRecog plateRecog = new PlateRecog(distance, speedLimit);
+                System.out.println("Sucsses");
             }
         });
         pnlMain.add(btnSet, gbc);
 
         JLabel lblChooseFile = new JLabel("Choose picture");
-        //gbc = new GridBagConstraints(); Uppdatera vid varje ny component
+        //gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0; // What row and col to take
         gbc.gridy = 3;
         gbc.insets = new Insets(0, 10, 0, 0);  //Margin
-        gbc.weightx = 1; // Typ hur det scalar eller något sånt, ganska oviktig sålänge alla har samma
-        pnlMain.add(lblChooseFile, gbc); // Lägg till i panel
+        gbc.weightx = 1;
+        pnlMain.add(lblChooseFile, gbc);
 
         JButton btnChooseFile = new JButton("Pick");
         gbc = new GridBagConstraints();
@@ -120,11 +140,20 @@ public class FrontEnd {
         gbc.weightx = 1;
 
         JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG, PNG & GIF Images", "jpg", "gif", "png");
+        chooser.setFileFilter(filter);
 
         btnChooseFile.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                chooser.showOpenDialog(btnChooseFile);
+                int reurnVal = chooser.showOpenDialog(btnChooseFile);
+                if (reurnVal == JFileChooser.APPROVE_OPTION) {
+                    String plate = plateRecog.findPlate(chooser.getSelectedFile());
+                    Date date = new Date();
+                    if (!plateRecog.storePlate(plate, date)) {
+                        plateRecog.isSpeeding(plate, date);
+                    }
+                }
             }
         });
         pnlMain.add(btnChooseFile, gbc);
@@ -155,10 +184,9 @@ public class FrontEnd {
         return pnlMain;
     }
 
-    public String setDistanceAndSpeed() {
-        return "";
-    }
-
+    /**
+     * ImagePanel, chose a file to set at background image for the JFrame
+     */
     class ImagePanel extends JComponent {
         private Image image;
 
