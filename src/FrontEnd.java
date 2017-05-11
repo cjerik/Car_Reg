@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -14,6 +15,11 @@ import java.util.Date;
 public class FrontEnd {
 
     PlateRecog plateRecog;
+    ArrayList<String> data;
+
+    public FrontEnd() {
+        this.data = new ArrayList<>();
+    }
 
     public static void main(String[] args) throws Exception {
         FrontEnd frontEnd = new FrontEnd();
@@ -115,7 +121,7 @@ public class FrontEnd {
                 int speedLimit = Integer.parseInt(txtSpeedLimit.getText());
                 txtDistance.setText("");
                 txtSpeedLimit.setText("");
-                PlateRecog plateRecog = new PlateRecog(distance, speedLimit);
+                plateRecog = new PlateRecog(distance, speedLimit);
                 System.out.println("Sucsses");
             }
         });
@@ -129,6 +135,22 @@ public class FrontEnd {
         gbc.insets = new Insets(0, 10, 0, 0);  //Margin
         gbc.weightx = 1;
         pnlMain.add(lblChooseFile, gbc);
+
+        JList list = new JList(data.toArray());
+        list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+        list.setVisibleRowCount(-1);
+
+        JScrollPane listScroller = new JScrollPane(list);
+        listScroller.setPreferredSize(new Dimension(180, 100));
+        gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.gridwidth = 4;
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.weightx = 1;
+        pnlMain.add(listScroller, gbc);
 
         JButton btnChooseFile = new JButton("Pick");
         gbc = new GridBagConstraints();
@@ -148,38 +170,20 @@ public class FrontEnd {
             public void actionPerformed(ActionEvent e) {
                 int reurnVal = chooser.showOpenDialog(btnChooseFile);
                 if (reurnVal == JFileChooser.APPROVE_OPTION) {
-                    String plate = plateRecog.findPlate(chooser.getSelectedFile());
+                    File file = new File(chooser.getSelectedFile().getAbsolutePath());
+                    String plate = plateRecog.findPlate(file);
                     Date date = new Date();
                     if (!plateRecog.storePlate(plate, date)) {
-                        plateRecog.isSpeeding(plate, date);
+                        double speed = plateRecog.isSpeeding(plate, date);
+                        //if (speed != -1) {
+                            data.add(String.valueOf(speed));
+                            list.updateUI();
+                        //}
                     }
                 }
             }
         });
         pnlMain.add(btnChooseFile, gbc);
-
-
-        Object[] data = new Object[4];
-        data[0] = "Hej";
-        data[1] = "HejHej";
-        data[2] = "HejHejHej";
-        data[3] = "HejHejHejHej";
-
-        JList list = new JList(data);
-        list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-        list.setVisibleRowCount(-1);
-
-        JScrollPane listScroller = new JScrollPane(list);
-        listScroller.setPreferredSize(new Dimension(180, 100));
-        gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.EAST;
-        gbc.gridwidth = 4;
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.weightx = 1;
-        pnlMain.add(listScroller, gbc);
 
         return pnlMain;
     }
