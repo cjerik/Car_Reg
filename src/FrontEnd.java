@@ -1,31 +1,45 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
 /**
  * Created by carl-johaneriksson on 10/05/17.
  */
 public class FrontEnd {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         FrontEnd frontEnd = new FrontEnd();
         frontEnd.run();
     }
 
-    public void run() {
+    public void run() throws Exception {
         setJFrame();
     }
 
 
-    private void setJFrame() {
+    private void setJFrame() throws Exception {
         JFrame frame = new JFrame("CarReg");
-        frame.getContentPane().add(setJPanel());
+        Container cp = frame.getContentPane();
+        /*String string = System.getProperty("user.home");
+        File file = new File(string + "/Documents/aleks3.png");
+        BufferedImage myImage = ImageIO.read(file);
+        ImagePanel image = new ImagePanel(myImage);
+        image.setBounds(0, 0, 780, 200);
+
+        cp.add(image);*/
+        cp.add(setJPanel());
+
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
+        //frame.setSize(780, 200);
         frame.setVisible(true);
     }
+
 
     private JPanel setJPanel() {
         JPanel pnlMain = new JPanel();
@@ -68,6 +82,7 @@ public class FrontEnd {
         gbc.gridy = 1;
         gbc.insets = new Insets(5, 5, 0, 10);
         gbc.weightx = 1;
+
         pnlMain.add(txtSpeedLimit, gbc);
 
         JButton btnSet = new JButton("Set");
@@ -78,6 +93,12 @@ public class FrontEnd {
         gbc.gridy = 2;
         gbc.insets = new Insets(5, 5, 5, 10);
         gbc.weightx = 1;
+        btnSet.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtSpeedLimit.getAction();
+            }
+        });
         pnlMain.add(btnSet, gbc);
 
         JLabel lblChooseFile = new JLabel("Choose picture");
@@ -97,15 +118,15 @@ public class FrontEnd {
         gbc.gridy = 3;
         gbc.insets = new Insets(5, 5, 5, 10);
         gbc.weightx = 1;
+
         JFileChooser chooser = new JFileChooser();
 
         btnChooseFile.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                chooser.showOpenDialog(btnChooseFile); 
+                chooser.showOpenDialog(btnChooseFile);
             }
         });
-
         pnlMain.add(btnChooseFile, gbc);
 
 
@@ -132,5 +153,22 @@ public class FrontEnd {
         pnlMain.add(listScroller, gbc);
 
         return pnlMain;
+    }
+
+    public String setDistanceAndSpeed() {
+        return "";
+    }
+
+    class ImagePanel extends JComponent {
+        private Image image;
+
+        public ImagePanel(Image image) {
+            this.image = image;
+        }
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.drawImage(image, 0, 0, this);
+        }
     }
 }
