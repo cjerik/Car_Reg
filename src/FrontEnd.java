@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -13,10 +12,9 @@ import java.util.Date;
  */
 public class FrontEnd {
     PlateRecog plateRecog;
-    ArrayList<String> data;
 
     public FrontEnd() {
-        this.data = new ArrayList<>();
+
     }
 
     public static void main(String[] args) throws Exception {
@@ -35,7 +33,7 @@ public class FrontEnd {
     /**
      * Sets the GUI frame. Calls for setJPanel() which intiates the
      * GUI.
-     * @throws Exception
+     * @throws Exception if unable to initiate GUI
      */
     private void setJFrame() throws Exception {
         JFrame frame = new JFrame("CarReg");
@@ -107,11 +105,16 @@ public class FrontEnd {
         btnSet.addActionListener(new ActionListener() { // Listen for button-click
             @Override
             public void actionPerformed(ActionEvent e) {
-                double distance = Double.valueOf(txtDistance.getText());
-                int speedLimit = Integer.parseInt(txtSpeedLimit.getText());
-                txtDistance.setText(""); // Reset field
-                txtSpeedLimit.setText(""); // Reset field
-                plateRecog = new PlateRecog(distance, speedLimit); // Initiat plateRacog
+                try { // If input valid
+                    double distance = Double.valueOf(txtDistance.getText());
+                    int speedLimit = Integer.parseInt(txtSpeedLimit.getText());
+                    txtDistance.setText(""); // Reset field
+                    txtSpeedLimit.setText(""); // Reset field
+                    plateRecog = new PlateRecog(distance, speedLimit); // Initiat plateRacog
+                } catch (NumberFormatException er) { // If input not number
+                    txtDistance.setText("Not number");
+                    txtSpeedLimit.setText("Not number");
+                }
             }
         });
         pnlMain.add(btnSet, gbc);
@@ -163,7 +166,7 @@ public class FrontEnd {
                     if (!plateRecog.storePlate(plate, date)) {
                         double speed = plateRecog.isSpeeding(plate, date);
                         if (speed != -1) {
-                            listModel.addElement(plate + " " + Math.floor(speed) + "km/h"); // Show the platenumber and speed
+                            listModel.addElement(plate + " " + Math.floor(speed) + " km/h"); // Show the platenumber and speed
                         }
                     }
                 }
