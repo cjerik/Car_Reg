@@ -152,6 +152,10 @@ public class FrontEnd {
         gbc.weightx = 1;
         pnlMain.add(listScroller, gbc);
 
+        /*DefaultListModel listModel = new DefaultListModel();
+        listModel.addListDataListener();
+        */
+
         JButton btnChooseFile = new JButton("Pick");
         gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.EAST;
@@ -177,7 +181,8 @@ public class FrontEnd {
                         double speed = plateRecog.isSpeeding(plate, date);
                         //if (speed != -1) {
                             data.add(String.valueOf(speed));
-                            list.updateUI();
+                            System.out.println("Should Print");
+                            System.out.println(speed);
                         //}
                     }
                 }
