@@ -160,7 +160,6 @@ public class FrontEnd {
             public void actionPerformed(ActionEvent e) {
                 int reurnVal = chooser.showOpenDialog(btnChooseFile);
                 if (reurnVal == JFileChooser.APPROVE_OPTION) {
-                    File file = new File(chooser.getSelectedFile().getAbsolutePath());
                     String plate = plateRecog.findPlate(chooser.getSelectedFile());
                     Date date = new Date();
                     if (!plateRecog.storePlate(plate, date)) {
