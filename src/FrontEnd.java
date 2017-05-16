@@ -1,19 +1,17 @@
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * Created by carl-johaneriksson on 10/05/17.
+ * Front-end for the CarReg application
+ * Start by calling Frontend.run()
  */
 public class FrontEnd {
-
     PlateRecog plateRecog;
     ArrayList<String> data;
 
@@ -42,19 +40,11 @@ public class FrontEnd {
     private void setJFrame() throws Exception {
         JFrame frame = new JFrame("CarReg");
         Container cp = frame.getContentPane();
-        /*String string = System.getProperty("user.home");
-        File file = new File(string + "/Documents/aleks3.png");
-        BufferedImage myImage = ImageIO.read(file);
-        ImagePanel image = new ImagePanel(myImage);
-        image.setBounds(0, 0, 780, 200);
-
-        cp.add(image);*/
         cp.add(setJPanel());
 
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
-        //frame.setSize(780, 200);
         frame.setVisible(true);
     }
 
@@ -87,7 +77,7 @@ public class FrontEnd {
         pnlMain.add(txtDistance, gbc);
 
         JLabel lblSpeedLimit = new JLabel("Speed limit");
-        //gbc = new GridBagConstraints();
+        gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0; // What row and col to take
         gbc.gridy = 1;
@@ -114,15 +104,14 @@ public class FrontEnd {
         gbc.gridy = 2;
         gbc.insets = new Insets(5, 5, 5, 10);
         gbc.weightx = 1;
-        btnSet.addActionListener(new ActionListener() {
+        btnSet.addActionListener(new ActionListener() { // Listen for button-click
             @Override
             public void actionPerformed(ActionEvent e) {
                 double distance = Double.valueOf(txtDistance.getText());
                 int speedLimit = Integer.parseInt(txtSpeedLimit.getText());
-                txtDistance.setText("");
-                txtSpeedLimit.setText("");
-                plateRecog = new PlateRecog(distance, speedLimit);
-                System.out.println("Sucsses");
+                txtDistance.setText(""); // Reset field
+                txtSpeedLimit.setText(""); // Reset field
+                plateRecog = new PlateRecog(distance, speedLimit); // Initiat plateRacog
             }
         });
         pnlMain.add(btnSet, gbc);
@@ -136,10 +125,8 @@ public class FrontEnd {
         gbc.weightx = 1;
         pnlMain.add(lblChooseFile, gbc);
 
-        JList list = new JList(data.toArray());
-        list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-        list.setVisibleRowCount(-1);
+        DefaultListModel listModel = new DefaultListModel();
+        JList list = new JList(listModel);
 
         JScrollPane listScroller = new JScrollPane(list);
         listScroller.setPreferredSize(new Dimension(180, 100));
@@ -152,10 +139,6 @@ public class FrontEnd {
         gbc.weightx = 1;
         pnlMain.add(listScroller, gbc);
 
-        /*DefaultListModel listModel = new DefaultListModel();
-        listModel.addListDataListener();
-        */
-
         JButton btnChooseFile = new JButton("Pick");
         gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.EAST;
@@ -166,24 +149,22 @@ public class FrontEnd {
         gbc.weightx = 1;
 
         JFileChooser chooser = new JFileChooser();
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG, PNG & GIF Images", "jpg", "gif", "png");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG, PNG Images", "jpg", "png");
         chooser.setFileFilter(filter);
 
-        btnChooseFile.addActionListener(new ActionListener() {
+        btnChooseFile.addActionListener(new ActionListener() { // If user sends car
             @Override
             public void actionPerformed(ActionEvent e) {
                 int reurnVal = chooser.showOpenDialog(btnChooseFile);
                 if (reurnVal == JFileChooser.APPROVE_OPTION) {
                     File file = new File(chooser.getSelectedFile().getAbsolutePath());
-                    String plate = plateRecog.findPlate(file);
+                    String plate = plateRecog.findPlate(chooser.getSelectedFile());
                     Date date = new Date();
                     if (!plateRecog.storePlate(plate, date)) {
                         double speed = plateRecog.isSpeeding(plate, date);
-                        //if (speed != -1) {
-                            data.add(String.valueOf(speed));
-                            System.out.println("Should Print");
-                            System.out.println(speed);
-                        //}
+                        if (speed != -1) {
+                            listModel.addElement(plate + " " + Math.floor(speed) + "km/h"); // Show the platenumber and speed
+                        }
                     }
                 }
             }
@@ -191,21 +172,5 @@ public class FrontEnd {
         pnlMain.add(btnChooseFile, gbc);
 
         return pnlMain;
-    }
-
-    /**
-     * ImagePanel, chose a file to set at background image for the JFrame
-     */
-    class ImagePanel extends JComponent {
-        private Image image;
-
-        public ImagePanel(Image image) {
-            this.image = image;
-        }
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            g.drawImage(image, 0, 0, this);
-        }
     }
 }
