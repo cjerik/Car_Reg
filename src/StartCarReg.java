@@ -1,5 +1,5 @@
 /**
- * Created by Alex on 2017-05-16.
+ * Starts the application CarReg
  */
 public class StartCarReg {
     public static void main(String[] args) throws Exception {
