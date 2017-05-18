@@ -81,7 +81,7 @@ public class PlateRecog {
     }
 
     /**
-     * Check if a car has been speednig between the checkpoints.
+     * Check if a car has been speeding between the checkpoints.
      * If it has method will return average speed in km/h, if
      * not it will return -1
      * @param plate of the car to check
@@ -92,13 +92,19 @@ public class PlateRecog {
         double timeCar = (date.getTime() - plates.get(plate).getTime()) / 1000;
 
         if (timeCar < MINTIMESECONDS) {
+            removeCar(plate);
             return (DISTANCE / timeCar) * 3.6;
         } else {
+            removeCar(plate);
             return -1.0;
         }
     }
 
     private boolean containsPlate(String plate) {
         return plates.containsKey(plate);
+    }
+
+    private void removeCar(String plate) {
+        plates.remove(plate);
     }
 }

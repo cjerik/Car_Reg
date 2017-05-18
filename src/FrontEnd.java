@@ -3,7 +3,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.Date;
 
 /**
@@ -15,11 +14,6 @@ public class FrontEnd {
 
     public FrontEnd() {
 
-    }
-
-    public static void main(String[] args) throws Exception {
-        FrontEnd frontEnd = new FrontEnd();
-        frontEnd.run();
     }
 
     /**
